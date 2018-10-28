@@ -1,0 +1,52 @@
+plugins {
+    id "java"
+    id "org.unbroken-dome.test-sets" version "1.4.2"
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+testSets {
+    functionalTest { dirName = 'functional-test' }
+    intigationTest { dirName = 'integration-test' }
+}
+
+dependencies {
+    compile (
+        'com.amazonaws:aws-lambda-java-core:1.1.0',
+        'com.amazonaws:aws-lambda-java-log4j:1.0.0',
+        'com.fasterxml.jackson.core:jackson-core:2.8.5',
+        'com.fasterxml.jackson.core:jackson-databind:2.8.5',
+        'com.fasterxml.jackson.core:jackson-annotations:2.8.5',
+        'junit:junit:4.11',
+        'com.amazonaws:aws-java-sdk-dynamodb:1.11.119',
+            'com.amazon.alexa:ask-sdk:2.7.2'
+    )
+
+    testCompile (
+            'junit:junit:4.11',
+            'io.rest-assured:rest-assured:3.0.6'
+    )
+
+
+}
+
+// http://docs.aws.amazon.com/lambda/latest/dg/create-deployment-pkg-zip-java.html
+task buildZip(type: Zip) {
+    baseName = "alexa-traditional-stories"
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtime
+    }
+}
+
+build.dependsOn buildZip
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2.1'
+}

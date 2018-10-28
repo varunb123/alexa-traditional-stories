@@ -1,0 +1,33 @@
+service: alexa-traditional-stories
+
+frameworkVersion: ">=1.2.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: java8
+  stage: ${opt:stage}
+  
+package:
+  artifact: build/distributions/alexa-traditional-stories.zip
+
+functions:
+  stories:
+    handler: com.varun.alexa.stories.handler.StoriesStreamHandler
+    events:
+      - alexaSkill: amzn1.ask.skill.0fae67a0-96d4-4df7-b124-a63d3d6d63cc
+
+resources:
+  Resources:
+    transactionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: stories_${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: title
+            AttributeType: S
+        KeySchema:
+          - AttributeName: title
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
